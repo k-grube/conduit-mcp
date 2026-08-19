@@ -1,0 +1,9 @@
+{
+  "id": "demo",
+  "name": "Demo",
+  "toolPrefix": "demo_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": [],
+  "publicRoutes": ["/callback"]
+}

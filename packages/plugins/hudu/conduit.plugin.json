@@ -1,0 +1,45 @@
+{
+  "id": "hudu",
+  "name": "Hudu",
+  "toolPrefix": "hudu_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": ["HUDU_API_KEY"],
+  "ui": {
+    "setupHelp": "1. In Hudu go to **Admin > API Keys**, then **+ New API Key** (top right).\n2. Name it `conduit-mcp`, scope **Full Access**. Optionally limit it to specific companies. Password access can stay off, no tool reads passwords.\n3. Copy the key into the field below.\n4. Article writes stay off until the toggles below enable create/update and archive.",
+    "settings": [
+      {
+        "key": "baseUrl",
+        "label": "Base URL",
+        "type": "text",
+        "required": true,
+        "help": "Your Hudu instance URL, e.g. https://docs.yourcompany.com"
+      },
+      {
+        "key": "HUDU_API_KEY",
+        "label": "API key",
+        "type": "secret",
+        "required": true,
+        "help": "API key from Hudu Admin -> API Keys"
+      },
+      {
+        "key": "writesEnabled",
+        "label": "Enable article writes",
+        "type": "toggle",
+        "help": "enables create and update of KB articles"
+      },
+      {
+        "key": "archiveEnabled",
+        "label": "Enable article archive/unarchive",
+        "type": "toggle"
+      },
+      {
+        "key": "draftFolderName",
+        "label": "Draft folder name",
+        "type": "text",
+        "help": "Folder new AI-created articles land in, defaults to AI Drafts"
+      }
+    ],
+    "statusCheck": true
+  }
+}

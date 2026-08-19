@@ -1,0 +1,12 @@
+dist/
+build/
+node_modules/
+pnpm-lock.yaml
+*.tsbuildinfo
+docs/superpowers/
+.superpowers/
+apps/web/.next/
+apps/web/out/
+apps/web/next-env.d.ts
+.dev/
+.superpowers/

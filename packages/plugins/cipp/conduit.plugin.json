@@ -1,0 +1,42 @@
+{
+  "id": "cipp",
+  "name": "CIPP",
+  "toolPrefix": "cipp_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": ["CIPP_CLIENT_SECRET"],
+  "ui": {
+    "setupHelp": "1. In CIPP open **CIPP** in the sidebar, then **Integrations > CIPP-API**.\n2. **Actions > Create New Client**, name it `conduit-mcp`. Leave **MCP Access Allowed** off, that converts the client into the MCP resource app and it stops working as a normal API client. Optionally set a read-only custom role and allowed IP ranges.\n3. Enable the client, submit, copy the application secret.\n4. **Actions > Save Azure Configuration** to push the client into the function app's auth settings.\n5. Fields below: Base URL is your CIPP instance URL, Client ID and Tenant ID as shown on the CIPP-API page.",
+    "settings": [
+      {
+        "key": "baseUrl",
+        "label": "Base URL",
+        "type": "text",
+        "required": true,
+        "help": "Your CIPP instance URL, e.g. https://cipp.yourdomain.com"
+      },
+      {
+        "key": "clientId",
+        "label": "Client ID",
+        "type": "text",
+        "required": true,
+        "help": "Application (client) ID of the Entra app registration used for the CIPP API"
+      },
+      {
+        "key": "CIPP_CLIENT_SECRET",
+        "label": "Client secret",
+        "type": "secret",
+        "required": true,
+        "help": "Client secret of the same app registration"
+      },
+      {
+        "key": "tenantId",
+        "label": "Tenant ID",
+        "type": "text",
+        "required": true,
+        "help": "Directory (tenant) ID of the Entra tenant hosting CIPP"
+      }
+    ],
+    "statusCheck": true
+  }
+}

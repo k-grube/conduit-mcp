@@ -1,0 +1,36 @@
+{
+  "name": "conduit-mcp",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n azurite,sdk-tsc,server-tsc,server,web -c gray,gray,gray,blue,green \"pnpm dev:azurite\" \"pnpm dev:sdk-tsc\" \"pnpm dev:server-tsc\" \"pnpm dev:server\" \"pnpm dev:web\"",
+    "serve": "concurrently -k -n azurite,server -c gray,blue \"pnpm dev:azurite\" \"pnpm dev:server --no-watch\"",
+    "dev:azurite": "node apps/server/node_modules/azurite/dist/src/azurite.js --inMemoryPersistence --silent --blobPort 10200 --queuePort 10201 --tablePort 10202",
+    "dev:sdk-tsc": "pnpm --filter @conduit-mcp/plugin-sdk exec tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "dev:server-tsc": "pnpm --filter @conduit-mcp/server exec tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "dev:server": "node scripts/dev.mjs server",
+    "dev:web": "node scripts/dev.mjs web",
+    "format": "prettier --write .",
+    "lint": "pnpm format && eslint .",
+    "lint:check": "eslint . && prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build",
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "concurrently": "10.0.3",
+    "eslint": "10.7.0",
+    "eslint-config-prettier": "10.1.8",
+    "husky": "9.1.7",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.65.0",
+    "vitest": "4.1.10"
+  }
+}

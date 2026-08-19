@@ -1,0 +1,83 @@
+{
+  "id": "halopsa",
+  "name": "HaloPSA",
+  "toolPrefix": "halopsa_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": ["HALOPSA_CLIENT_SECRET"],
+  "ui": {
+    "setupHelp": "1. In HaloPSA go to **Configuration > HaloPSA API > View Applications**, then **+ New** (top right).\n2. Enter a name (e.g. `conduit-mcp`), authentication method **Client ID and Secret**.\n3. **Agent to log in as**: **Application Identity**. Under **Identity Roles** pick `sys-all-permissions`, or a limited role set. The identity's roles bound what every tool can see, a restricted role set is the usual cause of 403s while the status check still passes.\n4. **Permissions** tab: **all** (or **all:standard** to exclude admin privileges), or the set the tools use: `read:tickets`, `read:customers`, `read:assets`, `read:invoices`, `read:quotes`, `read:contracts`, `read:reporting`, plus `edit:tickets` and `edit:reporting` when writes are enabled.\n5. Back on the **Details** tab, **Save**, then copy the client ID and secret into the fields below. The secret is shown once.",
+    "settings": [
+      {
+        "key": "companyUrl",
+        "label": "Company URL",
+        "type": "text",
+        "required": true,
+        "help": "Your HaloPSA instance URL, e.g. https://yourcompany.halopsa.com"
+      },
+      {
+        "key": "clientId",
+        "label": "Client ID",
+        "type": "text",
+        "required": true,
+        "help": "Client ID of a HaloPSA API application using client credentials (Configuration -> Integrations -> HaloPSA API)"
+      },
+      {
+        "key": "HALOPSA_CLIENT_SECRET",
+        "label": "Client secret",
+        "type": "secret",
+        "required": true,
+        "help": "Client secret of the same API application, shown once when the application is created"
+      },
+      {
+        "key": "oauthScope",
+        "label": "OAuth scope",
+        "type": "text",
+        "help": "Scopes granted to the token, defaults to all when unset"
+      },
+      {
+        "key": "tenant",
+        "label": "Tenant",
+        "type": "text",
+        "help": "Tenant name, hosted multi-tenant instances only, leave blank otherwise"
+      },
+      {
+        "key": "openTicketsViewId",
+        "label": "Open tickets view ID",
+        "type": "text",
+        "help": "Numeric ID of the ticket view that defines open tickets, from the view's URL in Halo; empty = Halo's built-in open filter"
+      },
+      {
+        "key": "serviceTeams",
+        "label": "Service teams",
+        "type": "tags",
+        "help": "Section names the agent availability tool reports on, empty = all teams"
+      },
+      {
+        "key": "clientTypeIncludes",
+        "label": "Client type includes",
+        "type": "tags",
+        "help": "CFType terms a client must match to count as active in client lists, empty = no type filter (CFType is a custom field)"
+      },
+      {
+        "key": "clientTypeExcludes",
+        "label": "Client type excludes",
+        "type": "tags",
+        "help": "CFType terms that hide a client from active client lists, e.g. a former-customer type, empty = no exclusions (CFType is a custom field)"
+      },
+      {
+        "key": "writesEnabled",
+        "label": "Enable writes",
+        "type": "toggle",
+        "help": "enables tools that write to HaloPSA, everything stays read-only when off"
+      },
+      {
+        "key": "defaultReportGroupName",
+        "label": "Default report group name",
+        "type": "text",
+        "help": "Report group new reports land in when no group is specified, e.g. AI Reports"
+      }
+    ],
+    "statusCheck": true
+  }
+}

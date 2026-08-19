@@ -1,0 +1,8 @@
+{
+  "id": "health-demo",
+  "name": "Health Demo",
+  "toolPrefix": "healthdemo_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "ui": { "settings": [], "actions": [], "statusCheck": true }
+}

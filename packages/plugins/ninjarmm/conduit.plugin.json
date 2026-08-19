@@ -1,0 +1,41 @@
+{
+  "id": "ninjarmm",
+  "name": "NinjaRMM",
+  "toolPrefix": "ninja_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": ["NINJA_CLIENT_SECRET"],
+  "ui": {
+    "setupHelp": "1. In NinjaOne go to **Administration > Apps > API**, then **Add** a client app (top right).\n2. Application platform: **API Services (machine-to-machine)**. Name: `conduit-mcp`.\n3. Scopes: tick **monitoring**, **management** and **control**.\n4. Allowed grant types: **Client Credentials**, then save.\n5. Copy the client ID and secret into the fields below.\n6. The OAuth scope field below defaults to `monitoring`. Set it to `monitoring management control` to request everything the app grants.",
+    "settings": [
+      {
+        "key": "baseUrl",
+        "label": "Base URL",
+        "type": "text",
+        "required": true,
+        "help": "Region instance, e.g. https://app.ninjarmm.com, https://eu.ninjarmm.com, https://oc.ninjarmm.com"
+      },
+      {
+        "key": "clientId",
+        "label": "Client ID",
+        "type": "text",
+        "required": true,
+        "help": "Client ID of a machine-to-machine API application (Administration -> Apps -> API)"
+      },
+      {
+        "key": "NINJA_CLIENT_SECRET",
+        "label": "Client secret",
+        "type": "secret",
+        "required": true,
+        "help": "Client secret of the same API application"
+      },
+      {
+        "key": "oauthScope",
+        "label": "OAuth scope",
+        "type": "text",
+        "help": "Defaults to monitoring when unset"
+      }
+    ],
+    "statusCheck": true
+  }
+}

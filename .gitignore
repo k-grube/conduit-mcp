@@ -1,0 +1,11 @@
+docs/superpowers/
+node_modules/
+dist/
+coverage/
+.env
+.dev/
+.dev.env
+apps/web/.next/
+apps/web/out/
+apps/web/next-env.d.ts
+.superpowers/

@@ -1,0 +1,15 @@
+packages:
+  - apps/*
+  - packages/*
+  - packages/plugins/*
+
+catalog:
+  '@types/node': 26.1.1
+
+# default 'install' silently runs a bare install before any script; installs here are
+# explicit and frozen-lockfile only
+verifyDepsBeforeRun: false
+ignoreScripts: true
+strictPeerDependencies: false
+minimumReleaseAge: 2880
+blockExoticSubdeps: true

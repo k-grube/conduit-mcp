@@ -1,0 +1,62 @@
+{
+  "id": "quickbooks",
+  "name": "QuickBooks Online",
+  "toolPrefix": "qbo_",
+  "entry": "src/index.ts",
+  "sdkVersion": "^0.1",
+  "secrets": [
+    "QBO_SANDBOX_CLIENT_ID",
+    "QBO_SANDBOX_CLIENT_SECRET",
+    "QBO_SANDBOX_REFRESH_TOKEN",
+    "QBO_PROD_CLIENT_ID",
+    "QBO_PROD_CLIENT_SECRET",
+    "QBO_PROD_REFRESH_TOKEN",
+    "QBO_STATE_JWT_SECRET"
+  ],
+  "publicRoutes": ["/callback"],
+  "ui": {
+    "setupHelp": "1. At [developer.intuit.com](https://developer.intuit.com) create an app for the **QuickBooks Online Accounting API**.\n2. **Keys & credentials**: copy the Development keys into the sandbox fields below, Production keys into the production fields.\n3. On the same page add redirect URI `https://<your conduit host>/api/plugins/quickbooks/callback`.\n4. Save the fields, pick the environment, then run **Connect to QuickBooks** and sign into the company. **Connection status** confirms.",
+    "settings": [
+      {
+        "key": "environment",
+        "label": "Environment",
+        "type": "select",
+        "help": "Which QuickBooks company tools operate against, defaults to sandbox; connect each environment separately",
+        "options": [
+          { "value": "sandbox", "label": "Sandbox" },
+          { "value": "production", "label": "Production" }
+        ]
+      },
+      {
+        "key": "QBO_SANDBOX_CLIENT_ID",
+        "label": "Sandbox client ID",
+        "type": "secret",
+        "help": "From your Intuit developer app, Keys & credentials -> Development"
+      },
+      {
+        "key": "QBO_SANDBOX_CLIENT_SECRET",
+        "label": "Sandbox client secret",
+        "type": "secret",
+        "help": "From the same development keys page"
+      },
+      {
+        "key": "QBO_PROD_CLIENT_ID",
+        "label": "Production client ID",
+        "type": "secret",
+        "help": "From your Intuit developer app, Keys & credentials -> Production"
+      },
+      {
+        "key": "QBO_PROD_CLIENT_SECRET",
+        "label": "Production client secret",
+        "type": "secret",
+        "help": "From the same production keys page"
+      }
+    ],
+    "actions": [
+      { "id": "connect", "label": "Connect to QuickBooks", "route": "/authorize", "method": "GET" },
+      { "id": "status", "label": "Connection status", "route": "/status", "method": "GET" },
+      { "id": "disconnect", "label": "Disconnect", "route": "/disconnect", "method": "POST" }
+    ],
+    "statusCheck": true
+  }
+}

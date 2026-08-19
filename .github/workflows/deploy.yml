@@ -1,0 +1,117 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PNPM_VERSION: '11.20.0'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: enable pnpm via corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+
+      - name: resolve pnpm store dir
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      # azurite is spawned in-process by the vitest global-setup, no service container needed
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:check
+      - run: pnpm typecheck
+      - run: pnpm test
+        env:
+          SKIP_LIVE_TESTS: '1'
+
+  build-push:
+    needs: test
+    # PRs get test feedback only; images are only built/pushed from main or a manual run
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ghcr requires a lowercase image path; derived so forks push under their own owner/repo
+      - name: derive image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      # first publish only: package defaults to private, flip it public in repo Settings > Packages
+      # so App Service can pull without registry credentials
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:latest
+          # the in-app update check compares its baked sha against the registry revision label
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            IMAGE_REF=${{ steps.image.outputs.name }}:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+
+  deploy:
+    needs: build-push
+    # opt-in: repo variable stays unset/false until the Azure resources + OIDC federation exist
+    if: vars.AZURE_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: point web app at the pushed image
+        run: |
+          az webapp config container set \
+            --name ${{ vars.AZURE_WEBAPP_NAME }} \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} \
+            --container-image-name ${{ needs.build-push.outputs.image }}:${{ github.sha }}
