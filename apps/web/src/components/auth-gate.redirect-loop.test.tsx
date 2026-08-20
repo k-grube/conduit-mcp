@@ -78,6 +78,39 @@ describe('AuthGate + api 401 redirect guard', () => {
     expect(loginRedirect).toHaveBeenCalledTimes(1)
   })
 
+  it('falls back to one interactive redirect when silent acquisition fails non-interactively', async () => {
+    const loginRedirect = vi.fn().mockResolvedValue(undefined)
+    getAuthConfig.mockResolvedValue({
+      configured: true,
+      tenantId: 'tenant-1',
+      clientId: 'client-1',
+      portalScope: 'api://client-1/portal.access',
+    })
+    const pca = fakePca(loginRedirect)
+    pca.acquireTokenSilent = vi
+      .fn()
+      .mockRejectedValue(Object.assign(new Error('monitor timeout'), { errorCode: 'monitor_window_timeout' }))
+    getMsal.mockResolvedValue(pca)
+    api.defaults.adapter = okAdapter()
+
+    const first = render(
+      <AuthGate>
+        <div>children</div>
+      </AuthGate>,
+    )
+    expect(await screen.findByText('Something went wrong')).toBeTruthy()
+    await waitFor(() => expect(loginRedirect).toHaveBeenCalledTimes(1))
+    first.unmount()
+
+    render(
+      <AuthGate>
+        <div>children</div>
+      </AuthGate>,
+    )
+    expect(await screen.findByText('Something went wrong')).toBeTruthy()
+    expect(loginRedirect).toHaveBeenCalledTimes(1)
+  })
+
   it('clears the guard on a successful probe so a later persistent 401 can redirect again', async () => {
     const loginRedirect = vi.fn().mockResolvedValue(undefined)
     getAuthConfig.mockResolvedValue({

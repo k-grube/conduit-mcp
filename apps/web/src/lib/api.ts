@@ -53,6 +53,11 @@ async function msalTokenGetter(): Promise<string> {
   } catch (err) {
     if (err instanceof InteractionRequiredAuthError) {
       await redirectToLogin()
+    } else if (sessionStorage.getItem(LOGIN_REDIRECT_KEY) !== '1') {
+      // wedged msal cache (stale account, iframe timeout): one interactive pass rewrites it,
+      // the guard keeps a persistent silent failure from looping through entra
+      sessionStorage.setItem(LOGIN_REDIRECT_KEY, '1')
+      await redirectToLogin()
     }
     throw err
   }

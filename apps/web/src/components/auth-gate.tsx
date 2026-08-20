@@ -40,6 +40,15 @@ function isForbidden(err: unknown): boolean {
   return errorStatus(err) === 403
 }
 
+// msal errors carry a stable errorCode, safe to log (no token material)
+function msalErrorCode(err: unknown): string | undefined {
+  if (typeof err !== 'object' || err === null) {
+    return undefined
+  }
+  const code = (err as { errorCode?: unknown }).errorCode
+  return typeof code === 'string' && code.length > 0 ? code : undefined
+}
+
 export function AuthGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GateState>('loading')
   const [account, setAccount] = useState<Account | undefined>(undefined)
@@ -96,14 +105,14 @@ export function AuthGate({ children }: { children: ReactNode }) {
             setState('not-authorized')
             return
           }
-          console.error('activity probe failed', errorStatus(err) ?? 'network')
+          console.error('activity probe failed', errorStatus(err) ?? msalErrorCode(err) ?? 'network')
           setState('error')
         }
       } catch (err) {
         if (cancelled) {
           return
         }
-        console.error('auth bootstrap failed', errorStatus(err) ?? 'network')
+        console.error('auth bootstrap failed', errorStatus(err) ?? msalErrorCode(err) ?? 'network')
         setState('error')
       }
     }
