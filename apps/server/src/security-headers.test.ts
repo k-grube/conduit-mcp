@@ -18,10 +18,11 @@ describe('securityHeaders', () => {
     securityHeaders()({} as never, res as never, next)
     expect(next).toHaveBeenCalledOnce()
     expect(res.headers['X-Content-Type-Options']).toBe('nosniff')
-    expect(res.headers['X-Frame-Options']).toBe('DENY')
+    expect(res.headers['X-Frame-Options']).toBe('SAMEORIGIN')
     expect(res.headers['Referrer-Policy']).toBe('strict-origin-when-cross-origin')
     expect(res.headers['Strict-Transport-Security']).toContain('max-age=')
-    expect(res.headers['Content-Security-Policy']).toContain("frame-ancestors 'none'")
+    // 'self' not 'none': msal's silent-refresh iframe lands back on the app origin
+    expect(res.headers['Content-Security-Policy']).toContain("frame-ancestors 'self'")
   })
 
   it('csp allows the entra host for msal and locks object/base', () => {

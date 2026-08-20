@@ -2,12 +2,13 @@ import type { RequestHandler } from 'express'
 
 // next static export inlines hydration scripts and mui/emotion inlines styles, so script/style
 // need 'unsafe-inline'; msal reaches entra for token acquisition (fetch + silent-refresh iframe);
-// fonts load from google. frame-ancestors 'none' blocks clickjacking of the portal.
+// fonts load from google. frame-ancestors 'self' blocks cross-origin clickjacking while letting
+// msal's hidden iframe land back on the app origin (the silent-refresh return leg)
 const CSP = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
-  "frame-ancestors 'none'",
+  "frame-ancestors 'self'",
   "img-src 'self' data:",
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
@@ -22,7 +23,7 @@ export function securityHeaders(): RequestHandler {
   return (_req, res, next) => {
     res.setHeader('Content-Security-Policy', CSP)
     res.setHeader('X-Content-Type-Options', 'nosniff')
-    res.setHeader('X-Frame-Options', 'DENY')
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN')
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
     res.setHeader('Strict-Transport-Security', 'max-age=31536000')
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
