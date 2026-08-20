@@ -37,6 +37,25 @@ function fakePca(overrides: Partial<Record<string, unknown>> = {}) {
 }
 
 describe('AuthGate', () => {
+  it('renders nothing and starts no auth flow inside an iframe', async () => {
+    const originalSelf = Object.getOwnPropertyDescriptor(window, 'self')
+    Object.defineProperty(window, 'self', { value: {}, configurable: true })
+    try {
+      const { container } = render(
+        <AuthGate>
+          <div>children</div>
+        </AuthGate>,
+      )
+      await Promise.resolve()
+      expect(container.innerHTML).toBe('')
+      expect(getAuthConfig).not.toHaveBeenCalled()
+    } finally {
+      if (originalSelf) {
+        Object.defineProperty(window, 'self', originalSelf)
+      }
+    }
+  })
+
   it('renders the setup card when auth is not configured', async () => {
     getAuthConfig.mockResolvedValue({ configured: false })
     vi.stubGlobal(

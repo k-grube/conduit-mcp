@@ -59,6 +59,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
     let cancelled = false
 
     async function run() {
+      // inside msal's hidden silent-refresh iframe the parent only reads the response hash;
+      // booting the app here starts a nested interaction and msal kills it (block_iframe_reload)
+      if (window.self !== window.top) {
+        return
+      }
       setState('loading')
       try {
         const cfg = await getAuthConfig()
